@@ -13,21 +13,9 @@ const fs = require('fs');
 dotenv.config();
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '50mb' }));
+app.use(express.json({ limit: '50mb' })); // Increased limit for larger files
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static('public/uploads'));
-
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Routes for homepage and dashboard
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
-});
+app.use('/uploads', express.static('public/uploads')); // Serve uploaded files
 
 // Suppress Mongoose strictQuery warning
 mongoose.set('strictQuery', true);
@@ -63,7 +51,7 @@ const storage = multer.diskStorage({
     cb(null, `${Date.now()}-${file.originalname}`);
   }
 });
-const upload = multer({ storage: storage, limits: { fileSize: 200 * 1024 * 1024 } });
+const upload = multer({ storage: storage, limits: { fileSize: 200 * 1024 * 1024 } }); // 200MB limit
 
 // Models
 const UserSchema = new mongoose.Schema({
@@ -104,7 +92,7 @@ const authMiddleware = (req, res, next) => {
 // Public Courses (no authentication required)
 app.get('/api/public-courses', async (req, res) => {
   try {
-    const courses = await Course.find({}, 'title description fileUrl');
+    const courses = await Course.find({}, 'title description fileUrl'); // Only return public fields
     res.json(courses);
   } catch (error) {
     console.error('Error fetching public courses:', error.message);
@@ -143,35 +131,52 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+
+// Serve static frontend files
+app.use(express.static(path.join(__dirname)));
+
+// Route to homepage (index.html)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Route to dashboard
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboard.html'));
+});
+
+
 // Add Course with File Upload
 app.post('/api/courses', authMiddleware, upload.single('file'), async (req, res) => {
   const { title, description } = req.body;
   const file = req.file;
+
   try {
     console.log('Adding course:', { title, description, file });
     let fileUrl;
+
     if (file) {
       const uploadResult = await cloudinary.uploader.upload(file.path, {
-        resource_type: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(file.mimetype.split('/')[1]) ? 'image' :
-                       ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv'].includes(file.mimetype.split('/')[1]) ? 'video' :
-                       ['mp3', 'wav', 'ogg', 'aac', 'flac'].includes(file.mimetype.split('/')[1]) ? 'audio' : 'raw',
+        resource_type: 'auto', // Automatically detect file type
         folder: 'jade_fx_courses',
         timestamp: Math.floor(Date.now() / 1000),
       });
+
       fileUrl = uploadResult.secure_url;
-      fs.unlinkSync(file.path);
+      fs.unlinkSync(file.path); // Clean up temp file
     } else if (req.body.fileUrl) {
       fileUrl = req.body.fileUrl;
     } else {
       throw new Error('No file or URL provided');
     }
+
     const course = new Course({ title, description, fileUrl });
     await course.save();
     console.log('Course saved:', course);
     res.status(201).json(course);
   } catch (error) {
     console.error('Error adding course:', error.message);
-    if (file) fs.unlinkSync(file.path);
+    if (file && fs.existsSync(file.path)) fs.unlinkSync(file.path); // Clean up on error
     res.status(500).json({ error: error.message || 'Failed to add course' });
   }
 });
@@ -256,13 +261,14 @@ app.post('/api/send-email', authMiddleware, async (req, res) => {
         segment_opts: { saved_segment_id: null, match: 'all' },
       },
       settings: {
-        subject_line: subject,
+        subject: subject,
         from_name: 'JadeFX',
         reply_to: 'no-reply@jadefx.com',
         to_name: 'Subscriber',
       },
-      content_type: 'html',
-      html: message,
+      content: {
+        html: message,
+      },
     });
 
     await Mailchimp.campaigns.send(response.id);
@@ -305,11 +311,6 @@ app.post('/api/emails', async (req, res) => {
     console.error('Error capturing email:', error.message);
     res.status(500).json({ error: 'Server error. Please try again.' });
   }
-});
-
-// Fallback for SPA (if applicable)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Error Handling Middleware
