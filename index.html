@@ -310,22 +310,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function submitEmail() {
   const emailInput = document.getElementById('email-input');
-  const passwordInput = document.getElementById('password-input');
   const submitBtn = document.getElementById('submit-btn');
   const btnText = document.getElementById('btn-text');
   const loadingSpinner = document.getElementById('loading-spinner');
   const formError = document.getElementById('form-error');
   const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
 
-  // Validate inputs
+  // Validate email
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     formError.textContent = 'Please enter a valid email address';
-    formError.classList.remove('hidden');
-    return;
-  }
-  if (!password) {
-    formError.textContent = 'Please enter a password';
     formError.classList.remove('hidden');
     return;
   }
@@ -337,20 +330,17 @@ async function submitEmail() {
   submitBtn.disabled = true;
 
   try {
-    const response = await fetch('/api/login', {
+    const response = await fetch('/api/emails', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email })
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to log in');
+      throw new Error(data.error || 'Failed to submit email');
     }
-
-    // Store token for authenticated requests
-    localStorage.setItem('token', data.token);
 
     // Show resources section
     document.getElementById('resources-section').classList.remove('hidden');
@@ -365,10 +355,10 @@ async function submitEmail() {
     });
 
     // Show success message
-    showNotification('Login successful! Your resources are ready.');
+    showNotification(data.message || 'Success! Your resources are now available.');
 
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Error:', error);
     formError.textContent = error.message;
     formError.classList.remove('hidden');
   } finally {
@@ -390,9 +380,7 @@ async function fetchResources() {
   loadingCourses.classList.remove('hidden');
 
   try {
-    const response = await fetch('/api/public-courses', {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    });
+    const response = await fetch('/api/public-courses');
     const courses = await response.json();
 
     if (!response.ok) {
