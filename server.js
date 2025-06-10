@@ -322,3 +322,10 @@ app.use((err, req, res, next) => {
 // Start Server with Port Fallback
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// In your frontend code
+const API_BASE = process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:3000' 
+  : ''; // Empty string for production (relative paths)
+
+fetch(`${API_BASE}/api/login`)
