@@ -17,6 +17,9 @@ app.use(express.json({ limit: '50mb' })); // Increased limit for larger files
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('public/uploads')); // Serve uploaded files
 
+// Serve static files from the Forex folder (root directory)
+app.use(express.static(path.join(__dirname, 'Forex')));
+
 // Suppress Mongoose strictQuery warning
 mongoose.set('strictQuery', true);
 
@@ -89,6 +92,21 @@ const authMiddleware = (req, res, next) => {
 
 // Routes
 
+// Serve index.html for the homepage
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Forex', 'index.html'));
+});
+
+// Serve dashboard.html for the /dashboard route
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Forex', 'dashboard.html'));
+});
+
+// Serve server.html (if needed)
+app.get('/server', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Forex', 'server.html'));
+});
+
 // Public Courses (no authentication required)
 app.get('/api/public-courses', async (req, res) => {
   try {
@@ -140,7 +158,9 @@ app.post('/api/courses', authMiddleware, upload.single('file'), async (req, res)
     let fileUrl;
     if (file) {
       const uploadResult = await cloudinary.uploader.upload(file.path, {
-        resource_type: 'video', // Explicitly set for video uploads
+        resource_type: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(file.mimetype.split('/')[1].toLowerCase()) ? 'image' :
+                       ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv'].includes(file.mimetype.split('/')[1].toLowerCase()) ? 'video' :
+                       ['mp3', 'wav', 'ogg', 'aac', 'flac'].includes(file.mimetype.split('/')[1].toLowerCase()) ? 'audio' : 'raw',
         folder: 'jade_fx_courses',
         timestamp: Math.floor(Date.now() / 1000),
       });
@@ -242,11 +262,12 @@ app.post('/api/send-email', authMiddleware, async (req, res) => {
         segment_opts: { saved_segment_id: null, match: 'all' },
       },
       settings: {
-        subject: subject,
+        subject_line: subject, // Updated to correct field name
         from_name: 'JadeFX',
         reply_to: 'no-reply@jadefx.com',
         to_name: 'Subscriber',
       },
+      content_type: 'html',
       content: {
         html: message,
       },
