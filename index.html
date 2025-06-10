@@ -295,168 +295,172 @@
   </footer>
 
   <script>
-    // Initialize animations
-    document.addEventListener('DOMContentLoaded', () => {
-      const fadeElements = document.querySelectorAll('.fade-in');
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      }, { threshold: 0.1 });
-      
-      fadeElements.forEach(el => observer.observe(el));
+document.addEventListener('DOMContentLoaded', () => {
+  const fadeElements = document.querySelectorAll('.fade-in');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+  
+  fadeElements.forEach(el => observer.observe(el));
+});
+
+async function submitEmail() {
+  const emailInput = document.getElementById('email-input');
+  const passwordInput = document.getElementById('password-input');
+  const submitBtn = document.getElementById('submit-btn');
+  const btnText = document.getElementById('btn-text');
+  const loadingSpinner = document.getElementById('loading-spinner');
+  const formError = document.getElementById('form-error');
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+
+  // Validate inputs
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    formError.textContent = 'Please enter a valid email address';
+    formError.classList.remove('hidden');
+    return;
+  }
+  if (!password) {
+    formError.textContent = 'Please enter a password';
+    formError.classList.remove('hidden');
+    return;
+  }
+
+  // Show loading state
+  formError.classList.add('hidden');
+  btnText.textContent = 'Processing...';
+  loadingSpinner.classList.remove('hidden');
+  submitBtn.disabled = true;
+
+  try {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
     });
 
-    // Submit email and fetch resources
-    async function submitEmail() {
-      const emailInput = document.getElementById('email-input');
-      const submitBtn = document.getElementById('submit-btn');
-      const btnText = document.getElementById('btn-text');
-      const loadingSpinner = document.getElementById('loading-spinner');
-      const formError = document.getElementById('form-error');
-      const email = emailInput.value.trim();
+    const data = await response.json();
 
-      // Validate email
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        formError.textContent = 'Please enter a valid email address';
-        formError.classList.remove('hidden');
-        return;
-      }
-
-      // Show loading state
-      formError.classList.add('hidden');
-      btnText.textContent = 'Processing...';
-      loadingSpinner.classList.remove('hidden');
-      submitBtn.disabled = true;
-
-      try {
-        fetch('/api/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email, password })
-})
-
-        const data = await response.json();
-
-        if (!response.ok && response.status !== 409) {
-          throw new Error(data.error || 'Failed to submit email');
-        }
-
-        // Show resources section
-        document.getElementById('resources-section').classList.remove('hidden');
-        
-        // Fetch and display resources
-        await fetchResources();
-
-        // Scroll to resources
-        window.scrollTo({
-          top: document.getElementById('resources-section').offsetTop - 80,
-          behavior: 'smooth'
-        });
-
-        // Show success message
-        if (response.status === 409) {
-          showNotification('Welcome back! Your resources are ready.');
-        } else {
-          showNotification('Success! Your resources are now available.');
-        }
-
-      } catch (error) {
-        console.error('Error:', error);
-        formError.textContent = error.message;
-        formError.classList.remove('hidden');
-      } finally {
-        // Reset button state
-        btnText.textContent = 'Get Instant Access';
-        loadingSpinner.classList.add('hidden');
-        submitBtn.disabled = false;
-      }
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to log in');
     }
 
-    // Fetch resources from API
-    async function fetchResources() {
-      const coursesList = document.getElementById('courses-list');
-      const noCourses = document.getElementById('no-courses');
-      const loadingCourses = document.getElementById('loading-courses');
+    // Store token for authenticated requests
+    localStorage.setItem('token', data.token);
 
-      // Show loading state
-      coursesList.innerHTML = '';
-      noCourses.classList.add('hidden');
-      loadingCourses.classList.remove('hidden');
+    // Show resources section
+    document.getElementById('resources-section').classList.remove('hidden');
+    
+    // Fetch and display resources
+    await fetchResources();
 
-      try {
-        const response = await fetch('http://localhost:3000/api/public-courses');
-        const courses = await response.json();
+    // Scroll to resources
+    window.scrollTo({
+      top: document.getElementById('resources-section').offsetTop - 80,
+      behavior: 'smooth'
+    });
 
-        if (!response.ok) {
-          throw new Error(courses.error || 'Failed to load resources');
-        }
+    // Show success message
+    showNotification('Login successful! Your resources are ready.');
 
-        // Hide loading spinner
-        loadingCourses.classList.add('hidden');
+  } catch (error) {
+    console.error('Login error:', error);
+    formError.textContent = error.message;
+    formError.classList.remove('hidden');
+  } finally {
+    // Reset button state
+    btnText.textContent = 'Get Instant Access';
+    loadingSpinner.classList.add('hidden');
+    submitBtn.disabled = false;
+  }
+}
 
-        if (!courses || courses.length === 0) {
-          noCourses.classList.remove('hidden');
-          return;
-        }
+async function fetchResources() {
+  const coursesList = document.getElementById('courses-list');
+  const noCourses = document.getElementById('no-courses');
+  const loadingCourses = document.getElementById('loading-courses');
 
-        // Filter for valid resources (with fileUrl)
-        const validCourses = courses.filter(course => course.fileUrl);
+  // Show loading state
+  coursesList.innerHTML = '';
+  noCourses.classList.add('hidden');
+  loadingCourses.classList.remove('hidden');
 
-        if (validCourses.length === 0) {
-          noCourses.classList.remove('hidden');
-          return;
-        }
+  try {
+    const response = await fetch('/api/public-courses', {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+    const courses = await response.json();
 
-        // Render resources
-        coursesList.innerHTML = validCourses.map(course => `
-          <div class="resource-card bg-blue-900/30 p-6 rounded-xl">
-            <div class="mb-4 overflow-hidden rounded-lg">
-              <img 
-                src="${course.fileUrl}" 
-                alt="${course.title || 'Trading Resource'}" 
-                class="w-full h-48 object-cover transition-transform duration-500 hover:scale-105"
-                onerror="this.src='https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80'"
-              >
-            </div>
-            <h3 class="text-xl font-semibold text-white mb-2">${course.title || 'Premium Resource'}</h3>
-            <p class="text-blue-200 mb-4">${course.description || 'Exclusive trading material'}</p>
-            <a 
-              href="${course.fileUrl}" 
-              download 
-              class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-              Download
-            </a>
-          </div>
-        `).join('');
-
-      } catch (error) {
-        console.error('Error fetching resources:', error);
-        loadingCourses.classList.add('hidden');
-        noCourses.classList.remove('hidden');
-        showNotification('Failed to load resources. Please try again.');
-      }
+    if (!response.ok) {
+      throw new Error(courses.error || 'Failed to load resources');
     }
 
-    // Show notification toast
-    function showNotification(message) {
-      const toast = document.createElement('div');
-      toast.className = 'fixed bottom-6 right-6 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg animate__animated animate__fadeInUp';
-      toast.textContent = message;
-      document.body.appendChild(toast);
-      
-      setTimeout(() => {
-        toast.classList.remove('animate__fadeInUp');
-        toast.classList.add('animate__fadeOutDown');
-        setTimeout(() => toast.remove(), 500);
-      }, 3000);
+    // Hide loading spinner
+    loadingCourses.classList.add('hidden');
+
+    if (!courses || courses.length === 0) {
+      noCourses.classList.remove('hidden');
+      return;
     }
+
+    // Filter for valid resources (with fileUrl)
+    const validCourses = courses.filter(course => course.fileUrl);
+
+    if (validCourses.length === 0) {
+      noCourses.classList.remove('hidden');
+      return;
+    }
+
+    // Render resources
+    coursesList.innerHTML = validCourses.map(course => `
+      <div class="resource-card bg-blue-900/30 p-6 rounded-xl">
+        <div class="mb-4 overflow-hidden rounded-lg">
+          <img 
+            src="${course.fileUrl}" 
+            alt="${course.title || 'Trading Resource'}" 
+            class="w-full h-48 object-cover transition-transform duration-500 hover:scale-105"
+            onerror="this.src='https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80'"
+          >
+        </div>
+        <h3 class="text-xl font-semibold text-white mb-2">${course.title || 'Premium Resource'}</h3>
+        <p class="text-blue-200 mb-4">${course.description || 'Exclusive trading material'}</p>
+        <a 
+          href="${course.fileUrl}" 
+          download 
+          class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+          Download
+        </a>
+      </div>
+    `).join('');
+
+  } catch (error) {
+    console.error('Error fetching resources:', error);
+    loadingCourses.classList.add('hidden');
+    noCourses.classList.remove('hidden');
+    showNotification('Failed to load resources. Please try again.');
+  }
+}
+
+function showNotification(message) {
+  const toast = document.createElement('div');
+  toast.className = 'fixed bottom-6 right-6 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg animate__animated animate__fadeInUp';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.remove('animate__fadeInUp');
+    toast.classList.add('animate__fadeOutDown');
+    setTimeout(() => toast.remove(), 500);
+  }, 3000);
+}
   </script>
 </body>
 </html>
