@@ -287,17 +287,11 @@ const pageTitle = document.getElementById('pageTitle');
 const uploadError = document.getElementById('uploadError');
 let currentCourseId = null;
 
-document.addEventListener('DOMContentLoaded', () => {
-  const storedToken = localStorage.getItem('token');
-  if (storedToken) {
-    token = storedToken;
-    console.log('Loaded token from localStorage:', token);
-    showDashboard();
-    loadCourses();
-    loadSubscriberCount();
-  } else {
-    showLogin();
-  }
+document.addEventListener('DOMContentLoaded', async () => {
+  // Clear token and force login
+  token = null;
+  localStorage.removeItem('token');
+  showLogin();
 });
 
 loginForm.addEventListener('submit', async (e) => {

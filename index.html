@@ -338,7 +338,7 @@ async function submitEmail() {
 
     const data = await response.json();
 
-    if (!response.ok) {
+    if (!response.ok && response.status !== 409) {
       throw new Error(data.error || 'Failed to submit email');
     }
 
@@ -355,7 +355,11 @@ async function submitEmail() {
     });
 
     // Show success message
-    showNotification(data.message || 'Success! Your resources are now available.');
+    if (response.status === 409) {
+      showNotification('Welcome back! Your resources are ready.');
+    } else {
+      showNotification('Success! Your resources are now available.');
+    }
 
   } catch (error) {
     console.error('Error:', error);
