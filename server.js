@@ -12,6 +12,10 @@ const fs = require('fs');
 
 dotenv.config();
 const app = express();
+
+// Serve static files from the "public" folder
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(cors());
 app.use(express.json({ limit: '50mb' })); // Increased limit for larger files
 app.use(express.urlencoded({ extended: true }));
@@ -86,6 +90,11 @@ const authMiddleware = (req, res, next) => {
     res.status(401).json({ error: 'Invalid token' });
   }
 };
+
+// Route for the homepage
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // Routes
 
