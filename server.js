@@ -13,13 +13,12 @@ const fs = require('fs');
 dotenv.config();
 const app = express();
 
-// Serve static files from the "public" folder
-app.use(express.static(path.join(__dirname, 'public')));
-
+// Middleware
 app.use(cors());
 app.use(express.json({ limit: '50mb' })); // Increased limit for larger files
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('public/uploads')); // Serve uploaded files
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from "public" folder
 
 // Suppress Mongoose strictQuery warning
 mongoose.set('strictQuery', true);
@@ -91,12 +90,12 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-// Route for the homepage
+// Routes
+
+// Serve homepage
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
-
-// Routes
 
 // Public Courses (no authentication required)
 app.get('/api/public-courses', async (req, res) => {
@@ -160,7 +159,7 @@ app.post('/api/courses', authMiddleware, upload.single('file'), async (req, res)
     } else {
       throw new Error('No file or URL provided');
     }
-    const course = new Course({ title, description, fileUrl });
+    const course = new Course предупрежд: { title, description, fileUrl });
     await course.save();
     console.log('Course saved:', course);
     res.status(201).json(course);
