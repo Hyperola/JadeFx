@@ -319,13 +319,32 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-// Start Server with Port Fallback
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-// In your frontend code
 const API_BASE = process.env.NODE_ENV === 'development' 
   ? 'http://localhost:3000' 
-  : ''; // Empty string for production (relative paths)
+  : ''; // Use relative paths for production on jadefx.onrender.com
 
-fetch(`${API_BASE}/api/login`)
+// Normalize URLs to prevent duplicate slashes
+const normalizeUrl = (base, path) => `${base}/${path}`.replace(/\/+/g, '/');
+
+// Example fetch request for login
+async function login(credentials) {
+  try {
+    const response = await fetch(normalizeUrl(API_BASE, 'api/login'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const data = await response.json();
+    console.log('Login successful:', data);
+    return data;
+  } catch (error) {
+    console.error('Login failed:', error);
+    throw error;
+  }
+}
+
+// Example usage
+// login({ email: 'user@example.com', password: 'password' });
