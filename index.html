@@ -332,12 +332,11 @@
       submitBtn.disabled = true;
 
       try {
-        // Submit email
-        const response = await fetch('http://localhost:3000/api/emails', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
-        });
+        fetch('/api/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email, password })
+})
 
         const data = await response.json();
 
