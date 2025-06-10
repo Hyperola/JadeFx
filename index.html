@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jade Fx - Premium Forex Trading Resources</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --dark: #0f172a;
+      --light: #f8fafc;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--dark);
+      color: var(--light);
+      overflow-x: hidden;
+    }
+    
+    .hero-gradient {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 58, 138, 0.9) 100%);
+    }
+    
+    .card-gradient {
+      background: linear-gradient(145deg, rgba(30, 58, 138, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+    }
+    
+    .glow {
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+    }
+    
+    .glow:hover {
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.8);
+    }
+    
+    .ticker {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1rem 0;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .ticker-content {
+      display: inline-block;
+      white-space: nowrap;
+      padding-right: 100%;
+      animation: ticker 20s linear infinite;
+    }
+    
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+    
+    .resource-card {
+      transition: all 0.3s ease;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    
+    .resource-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(59, 130, 246, 0.5);
+    }
+    
+    .loading-spinner {
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease;
+    }
+    
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .animate-delay-100 {
+      animation-delay: 0.1s;
+    }
+    .animate-delay-200 {
+      animation-delay: 0.2s;
+    }
+    .animate-delay-300 {
+      animation-delay: 0.3s;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Hero Section -->
+  <section class="relative h-screen flex items-center justify-center overflow-hidden">
+    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center opacity-20"></div>
+    <div class="absolute inset-0 hero-gradient"></div>
+    
+    <div class="relative z-10 container mx-auto px-4 text-center">
+      <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 animate__animated animate__fadeInDown">
+        <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">Master Forex Trading</span>
+      </h1>
+      <p class="text-xl md:text-2xl max-w-2xl mx-auto text-blue-100 mb-10 animate__animated animate__fadeIn animate-delay-100">
+        Unlock elite trading strategies and premium resources with Jade FX
+      </p>
+      
+      <div class="max-w-md mx-auto bg-white/10 backdrop-blur-sm rounded-xl p-8 border border-white/10 glow animate__animated animate__fadeIn animate-delay-200">
+        <div class="mb-6">
+          <input 
+            type="email" 
+            id="email-input" 
+            placeholder="Enter your email" 
+            class="w-full px-5 py-3 bg-white/5 border border-blue-500/30 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            required
+          >
+        </div>
+        <button 
+          onclick="submitEmail()" 
+          id="submit-btn"
+          class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center"
+        >
+          <span id="btn-text">Get Instant Access</span>
+          <div id="loading-spinner" class="ml-2 hidden loading-spinner" style="width: 20px; height: 20px; border-width: 2px;"></div>
+        </button>
+        <p id="form-error" class="mt-2 text-sm text-red-300 hidden"></p>
+      </div>
+    </div>
+    
+    <div class="absolute bottom-0 left-0 right-0 ticker">
+      <div class="ticker-content text-blue-300 font-mono">
+        <span class="inline-block px-4">EUR/USD: 1.0924 (+0.12%)</span>
+        <span class="inline-block px-4">GBP/USD: 1.2765 (-0.05%)</span>
+        <span class="inline-block px-4">USD/JPY: 143.82 (+0.33%)</span>
+        <span class="inline-block px-4">AUD/USD: 0.6689 (+0.18%)</span>
+        <span class="inline-block px-4">GOLD: $1,932.40 (+0.42%)</span>
+        <span class="inline-block px-4">OIL: $75.68 (-0.23%)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="py-16 bg-gradient-to-b from-blue-900/50 to-blue-950/80">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-8 text-center">
+        <div class="fade-in">
+          <div class="text-4xl md:text-5xl font-bold text-blue-400 mb-2">20K+</div>
+          <div class="text-blue-200">Traders Empowered</div>
+        </div>
+        <div class="fade-in">
+          <div class="text-4xl md:text-5xl font-bold text-blue-400 mb-2">99%</div>
+          <div class="text-blue-200">Success Rate</div>
+        </div>
+        <div class="fade-in col-span-2 md:col-span-1">
+          <div class="text-4xl md:text-5xl font-bold text-blue-400 mb-2">24/7</div>
+          <div class="text-blue-200">Market Support</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resources Section -->
+  <section id="resources-section" class="hidden py-20 bg-gradient-to-b from-blue-950/80 to-blue-900/50">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Your Exclusive Resources</h2>
+        <p class="text-lg text-blue-200 max-w-2xl mx-auto">
+          Premium trading materials curated by our expert analysts
+        </p>
+      </div>
+      
+      <div id="loading-courses" class="flex justify-center my-12">
+        <div class="loading-spinner"></div>
+      </div>
+      
+      <div id="no-courses" class="hidden text-center py-12">
+        <div class="text-xl text-blue-300 mb-4">No resources available at the moment</div>
+        <button onclick="fetchResources()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg transition">
+          Refresh Resources
+        </button>
+      </div>
+      
+      <div id="courses-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+      
+      <div class="text-center mt-12">
+        <button onclick="fetchResources()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition flex items-center mx-auto">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+          </svg>
+          Refresh Resources
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="py-20 bg-blue-900/30">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Success Stories</h2>
+        <p class="text-lg text-blue-200 max-w-2xl mx-auto">
+          Hear from traders who transformed their results with Jade FX
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 fade-in">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-300 font-bold mr-4">ST</div>
+            <div>
+              <div class="font-semibold text-white">Sophie T.</div>
+              <div class="text-sm text-blue-300">Forex Trader, London</div>
+            </div>
+          </div>
+          <p class="text-blue-100 italic">
+            "Jade FX's resources helped me go from losing money to consistent profits in just 3 months. Their market analysis is unmatched."
+          </p>
+          <div class="flex mt-4">
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.414 0l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414l2.8-2.034a1 1 0 00.364-1.118l-1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.414 0l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414l2.8-2.034a1 1 0 00.364-1.118l-1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.414 0l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414l2.8-2.034a1 1 0 00.364-1.118l-1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.414 0l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414l2.8-2.034a1 1 0 00.364-1.118l-1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.414 0l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414l2.8-2.034a1 1 0 00.364-1.118l-1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          </div>
+        </div>
+        
+        <div class="bg-white/5 backdrop-blur-sm p-8 rounded-xl border border-white/10 fade-in">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-300 font-bold mr-4">LR</div>
+            <div>
+              <div class="font-semibold text-white">Liam R.</div>
+              <div class="text-sm text-blue-300">Investment Manager, NY</div>
+            </div>
+          </div>
+          <p class="text-blue-100 italic">
+            "The technical analysis frameworks from Jade FX have become core to our trading strategy. Highly recommended for serious traders."
+          </p>
+          <div class="flex mt-4">
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.414 0l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414l2.8-2.034a1 1 0 00.364-1.118l-1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.414 0l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414l2.8-2.034a1 1 0 00.364-1.118l-1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.414 0l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414l2.8-2.034a1 1 0 00.364-1.118l-1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.414 0l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414l2.8-2.034a1 1 0 00.364-1.118l-1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.414 0l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414l2.8-2.034a1 1 0 00.364-1.118l-1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 bg-gradient-to-r from-blue-900 to-blue-800">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Transform Your Trading?</h2>
+      <p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+        Join thousands of successful traders who trust Jade FX for premium market insights
+      </p>
+      <button onclick="document.getElementById('email-input').focus()" class="bg-white text-blue-800 hover:bg-blue-100 font-semibold py-3 px-8 rounded-lg transition transform hover:scale-105">
+        Get Started Now
+      </button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-blue-950 py-12">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-6 md:mb-0">
+          <div class="text-2xl font-bold text-white mb-2">Jade FX</div>
+          <div class="text-blue-300">Premium Forex Trading Resources</div>
+        </div>
+        
+        <div class="flex space-x-6">
+          <a href="#" class="text-blue-300 hover:text-white transition">Privacy Policy</a>
+          <a href="#" class="text-blue-300 hover:text-white transition">Terms</a>
+          <a href="#" class="text-blue-300 hover:text-white transition">Contact</a>
+        </div>
+      </div>
+      
+      <div class="border-t border-blue-900 mt-8 pt-8 text-center text-blue-400 text-sm">
+        © 2025 Jade FX. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize animations
+    document.addEventListener('DOMContentLoaded', () => {
+      const fadeElements = document.querySelectorAll('.fade-in');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      fadeElements.forEach(el => observer.observe(el));
+    });
+
+    // Submit email and fetch resources
+    async function submitEmail() {
+      const emailInput = document.getElementById('email-input');
+      const submitBtn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+      const loadingSpinner = document.getElementById('loading-spinner');
+      const formError = document.getElementById('form-error');
+      const email = emailInput.value.trim();
+
+      // Validate email
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        formError.textContent = 'Please enter a valid email address';
+        formError.classList.remove('hidden');
+        return;
+      }
+
+      // Show loading state
+      formError.classList.add('hidden');
+      btnText.textContent = 'Processing...';
+      loadingSpinner.classList.remove('hidden');
+      submitBtn.disabled = true;
+
+      try {
+        // Submit email
+        const response = await fetch('http://localhost:3000/api/emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok && response.status !== 409) {
+          throw new Error(data.error || 'Failed to submit email');
+        }
+
+        // Show resources section
+        document.getElementById('resources-section').classList.remove('hidden');
+        
+        // Fetch and display resources
+        await fetchResources();
+
+        // Scroll to resources
+        window.scrollTo({
+          top: document.getElementById('resources-section').offsetTop - 80,
+          behavior: 'smooth'
+        });
+
+        // Show success message
+        if (response.status === 409) {
+          showNotification('Welcome back! Your resources are ready.');
+        } else {
+          showNotification('Success! Your resources are now available.');
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        formError.textContent = error.message;
+        formError.classList.remove('hidden');
+      } finally {
+        // Reset button state
+        btnText.textContent = 'Get Instant Access';
+        loadingSpinner.classList.add('hidden');
+        submitBtn.disabled = false;
+      }
+    }
+
+    // Fetch resources from API
+    async function fetchResources() {
+      const coursesList = document.getElementById('courses-list');
+      const noCourses = document.getElementById('no-courses');
+      const loadingCourses = document.getElementById('loading-courses');
+
+      // Show loading state
+      coursesList.innerHTML = '';
+      noCourses.classList.add('hidden');
+      loadingCourses.classList.remove('hidden');
+
+      try {
+        const response = await fetch('http://localhost:3000/api/public-courses');
+        const courses = await response.json();
+
+        if (!response.ok) {
+          throw new Error(courses.error || 'Failed to load resources');
+        }
+
+        // Hide loading spinner
+        loadingCourses.classList.add('hidden');
+
+        if (!courses || courses.length === 0) {
+          noCourses.classList.remove('hidden');
+          return;
+        }
+
+        // Filter for valid resources (with fileUrl)
+        const validCourses = courses.filter(course => course.fileUrl);
+
+        if (validCourses.length === 0) {
+          noCourses.classList.remove('hidden');
+          return;
+        }
+
+        // Render resources
+        coursesList.innerHTML = validCourses.map(course => `
+          <div class="resource-card bg-blue-900/30 p-6 rounded-xl">
+            <div class="mb-4 overflow-hidden rounded-lg">
+              <img 
+                src="${course.fileUrl}" 
+                alt="${course.title || 'Trading Resource'}" 
+                class="w-full h-48 object-cover transition-transform duration-500 hover:scale-105"
+                onerror="this.src='https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80'"
+              >
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">${course.title || 'Premium Resource'}</h3>
+            <p class="text-blue-200 mb-4">${course.description || 'Exclusive trading material'}</p>
+            <a 
+              href="${course.fileUrl}" 
+              download 
+              class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+              Download
+            </a>
+          </div>
+        `).join('');
+
+      } catch (error) {
+        console.error('Error fetching resources:', error);
+        loadingCourses.classList.add('hidden');
+        noCourses.classList.remove('hidden');
+        showNotification('Failed to load resources. Please try again.');
+      }
+    }
+
+    // Show notification toast
+    function showNotification(message) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-6 right-6 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg animate__animated animate__fadeInUp';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.remove('animate__fadeInUp');
+        toast.classList.add('animate__fadeOutDown');
+        setTimeout(() => toast.remove(), 500);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

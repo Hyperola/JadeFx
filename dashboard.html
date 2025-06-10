@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JadeFX Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+    }
+    .sidebar {
+      transition: all 0.3s ease;
+    }
+    .course-card {
+      transition: all 0.2s ease;
+    }
+    .course-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    .modal {
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+    .subscriber-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <div class="sidebar bg-gray-900 text-white w-64 flex-shrink-0 hidden md:block">
+      <div class="p-4 border-b border-gray-800">
+        <h1 class="text-2xl font-bold text-jade-400">JadeFX</h1>
+        <p class="text-gray-400 text-sm">Admin Dashboard</p>
+      </div>
+      <nav class="p-4">
+        <div class="space-y-2">
+          <a href="#" class="flex items-center space-x-2 text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-lg transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+            </svg>
+            <span>Dashboard</span>
+          </a>
+          <a href="#" class="flex items-center space-x-2 bg-gray-800 text-white px-3 py-2 rounded-lg" onclick="showCourses()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+            </svg>
+            <span>Courses</span>
+          </a>
+          <a href="#" class="flex items-center space-x-2 text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-lg transition" onclick="showSubscribers()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd" />
+            </svg>
+            <span>Subscribers</span>
+          </a>
+          <a href="#" class="flex items-center space-x-2 text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-lg transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+            </svg>
+            <span>Settings</span>
+          </a>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Top Navigation -->
+      <header class="bg-white border-b border-gray-200 flex items-center justify-between p-4">
+        <div class="flex items-center space-x-4">
+          <button class="md:hidden text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <h2 id="pageTitle" class="text-xl font-semibold text-gray-800">Course Management</h2>
+        </div>
+        <div class="flex items-center space-x-4">
+          <button onclick="logout()" class="text-gray-600 hover:text-gray-900">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
+          <div class="w-8 h-8 rounded-full bg-gray-300"></div>
+        </div>
+      </header>
+
+      <!-- Login Section -->
+      <div id="loginSection" class="flex-1 overflow-y-auto p-6 bg-white">
+        <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Admin Login</h2>
+          <form id="loginForm">
+            <div class="mb-4">
+              <label for="loginEmail" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input type="email" id="loginEmail" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="mb-6">
+              <label for="loginPassword" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <input type="password" id="loginPassword" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition">
+              Login
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Dashboard Section -->
+      <div id="dashboardSection" class="hidden flex-1 overflow-y-auto p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 id="pageTitle" class="text-2xl font-bold text-gray-800">Manage Courses</h2>
+          <div class="flex space-x-4">
+            <button onclick="showAddCourseModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+              </svg>
+              <span>Add Course</span>
+            </button>
+            <button onclick="showEmailMarketingModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+              </svg>
+              <span>Email Marketing</span>
+            </button>
+          </div>
+        </div>
+        <div class="mb-6 p-4 bg-white rounded-lg shadow-md">
+          <h3 class="text-lg font-semibold text-gray-700">Subscriber Stats</h3>
+          <p class="text-2xl font-bold text-blue-600" id="subscriberCount">Loading...</p>
+        </div>
+
+        <!-- Courses List -->
+        <div id="coursesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+          <!-- Courses will be loaded here dynamically -->
+          <div class="text-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+            <p class="mt-4 text-gray-600">Loading courses...</p>
+          </div>
+        </div>
+
+        <!-- Subscribers List -->
+        <div id="subscribersContainer" class="hidden">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Subscriber Emails</h3>
+          <div id="subscribersList" class="subscriber-list bg-white p-4 rounded-lg shadow-md"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Course Modal -->
+  <div id="courseModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 invisible opacity-0">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-screen overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 id="modalTitle" class="text-xl font-semibold text-gray-800">Add New Course</h3>
+          <button onclick="hideModal()" class="text-gray-400 hover:text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <form id="courseForm" enctype="multipart/form-data">
+          <input type="hidden" id="courseId">
+          <div class="mb-4">
+            <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+            <input type="text" id="title" name="title" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div class="mb-4">
+            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea id="description" name="description" rows="4" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">File Upload</label>
+            <div class="mt-1 flex items-center">
+              <label for="file" class="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <span>Choose File</span>
+                <input id="file" name="file" type="file" class="sr-only" onchange="updateFileName()">
+              </label>
+              <span id="fileName" class="ml-3 text-sm text-gray-500">No file chosen</span>
+            </div>
+            <p class="mt-1 text-sm text-gray-500">Or provide a URL instead</p>
+          </div>
+          <div class="mb-4">
+            <label for="fileUrl" class="block text-sm font-medium text-gray-700 mb-1">File URL</label>
+            <input type="url" id="fileUrl" name="fileUrl" placeholder="https://example.com/file" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div id="uploadError" class="text-red-500 hidden mb-4"></div>
+          <div class="flex justify-end space-x-3 pt-4">
+            <button type="button" onclick="hideModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Cancel
+            </button>
+            <button type="submit" id="submitBtn" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Save Course
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="deleteModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 invisible opacity-0">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-semibold text-gray-800">Confirm Deletion</h3>
+          <button onclick="hideDeleteModal()" class="text-gray-400 hover:text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <p class="text-gray-600 mb-6">Are you sure you want to delete this course? This action cannot be undone.</p>
+        <div class="flex justify-end space-x-3">
+          <button onclick="hideDeleteModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Cancel
+          </button>
+          <button onclick="confirmDelete()" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Email Marketing Modal -->
+  <div id="emailMarketingModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 invisible opacity-0">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-screen overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-semibold text-gray-800">Email Marketing</h3>
+          <button onclick="hideEmailMarketingModal()" class="text-gray-400 hover:text-gray-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <form id="emailForm">
+          <div class="mb-4">
+            <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+            <input type="text" id="subject" name="subject" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div class="mb-4">
+            <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+            <textarea id="message" name="message" rows="6" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          </div>
+          <div class="flex justify-end space-x-3 pt-4">
+            <button type="button" onclick="hideEmailMarketingModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Cancel
+            </button>
+            <button type="submit" id="sendEmailBtn" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+              Send Email
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let token = null;
+    const apiBaseUrl = 'http://localhost:3000/api';
+
+    const loginSection = document.getElementById('loginSection');
+    const dashboardSection = document.getElementById('dashboardSection');
+    const loginForm = document.getElementById('loginForm');
+    const courseForm = document.getElementById('courseForm');
+    const coursesContainer = document.getElementById('coursesContainer');
+    const subscribersContainer = document.getElementById('subscribersContainer');
+    const subscribersList = document.getElementById('subscribersList');
+    const courseModal = document.getElementById('courseModal');
+    const deleteModal = document.getElementById('deleteModal');
+    const emailMarketingModal = document.getElementById('emailMarketingModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const fileNameElement = document.getElementById('fileName');
+    const subscriberCount = document.getElementById('subscriberCount');
+    const emailForm = document.getElementById('emailForm');
+    const pageTitle = document.getElementById('pageTitle');
+    const uploadError = document.getElementById('uploadError');
+    let currentCourseId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const storedToken = localStorage.getItem('token');
+      if (storedToken) {
+        token = storedToken;
+        console.log('Loaded token from localStorage:', token);
+        showDashboard();
+        loadCourses();
+        loadSubscriberCount();
+      } else {
+        showLogin();
+      }
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      
+      try {
+        const response = await fetch(`${apiBaseUrl}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) throw new Error(data.error || 'Login failed');
+        
+        token = data.token;
+        console.log('Received token:', token);
+        localStorage.setItem('token', token);
+        showDashboard();
+        loadCourses();
+        loadSubscriberCount();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    courseForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const courseId = document.getElementById('courseId').value;
+      const isEdit = !!courseId;
+      
+      const formData = new FormData();
+      formData.append('title', document.getElementById('title').value);
+      formData.append('description', document.getElementById('description').value);
+      
+      const fileInput = document.getElementById('file');
+      if (fileInput.files[0]) {
+        formData.append('file', fileInput.files[0]);
+      } else if (document.getElementById('fileUrl').value) {
+        formData.append('fileUrl', document.getElementById('fileUrl').value);
+      } else if (!isEdit) {
+        alert('Please provide a file or URL');
+        return;
+      }
+
+      try {
+        uploadError.classList.add('hidden');
+        const url = isEdit ? `${apiBaseUrl}/courses/${courseId}` : `${apiBaseUrl}/courses`;
+        const method = isEdit ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method,
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) throw new Error(result.error || 'Operation failed');
+        
+        hideModal();
+        loadCourses();
+        alert(`Course ${isEdit ? 'updated' : 'added'} successfully!`);
+      } catch (error) {
+        uploadError.textContent = `Error: ${error.message}`;
+        uploadError.classList.remove('hidden');
+        console.error('Error:', error);
+      }
+    });
+
+    async function loadCourses() {
+      try {
+        const response = await fetch(`${apiBaseUrl}/courses`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        const courses = await response.json();
+        
+        if (!response.ok) throw new Error(courses.error || 'Failed to load courses');
+        
+        renderCourses(courses);
+      } catch (error) {
+        console.error('Error loading courses:', error);
+        coursesContainer.innerHTML = `
+          <div class="col-span-3 text-center py-8">
+            <p class="text-red-500">Error loading courses: ${error.message}</p>
+            <button onclick="loadCourses()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+              Retry
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    async function loadSubscriberCount() {
+      try {
+        const response = await fetch(`${apiBaseUrl}/subscribers/count`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) throw new Error(data.error || 'Failed to load subscriber count');
+        
+        subscriberCount.textContent = data.count;
+      } catch (error) {
+        subscriberCount.textContent = 'Error';
+        console.error('Error loading subscriber count:', error);
+      }
+    }
+
+    async function loadSubscribers() {
+      try {
+        const response = await fetch(`${apiBaseUrl}/subscribers`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        const subscribers = await response.json();
+        
+        if (!response.ok) throw new Error(subscribers.error || 'Failed to load subscribers');
+        
+        subscribersList.innerHTML = subscribers.map(sub => `
+          <div class="p-2 border-b border-gray-200">${sub.email}</div>
+        `).join('');
+      } catch (error) {
+        subscribersList.innerHTML = `<p class="p-2 text-red-500">Error: ${error.message}</p>`;
+        console.error('Error loading subscribers:', error);
+      }
+    }
+
+    function renderCourses(courses) {
+      if (courses.length === 0) {
+        coursesContainer.innerHTML = `
+          <div class="col-span-3 text-center py-8">
+            <p class="text-gray-500">No courses found. Add your first course!</p>
+          </div>
+        `;
+        return;
+      }
+
+      coursesContainer.innerHTML = courses.map(course => `
+        <div class="course-card bg-white rounded-lg shadow-md overflow-hidden">
+          <div class="h-48 bg-gray-200 overflow-hidden">
+            ${course.fileUrl ? `
+              <img src="${course.fileUrl}" alt="${course.title}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/400x200?text=Course+Image'">
+            ` : `
+              <div class="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2xl2-2v0" />
+</svg>
+
+              </div>
+            `}
+          </div>
+          <div class="p-4">
+            <h3 class="font-semibold text-lg text-gray-800 mb-1">${course.title}</h3>
+            <p class="text-gray-600 text-sm mb-3 line-clamp-2">${course.description || 'No description'}</p>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-gray-500">${new Date(course.createdAt).toLocaleDateString()}</span>
+              <div class="flex space-x-2">
+                <button onclick="editCourse('${course._id}')" class="text-blue-600 hover:text-blue-800">
+                  <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  </svg>
+                </button>
+                <button onclick="showDeleteModal('${course._id}')" class="text-red-600 hover:text-red-800">
+                  <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function showAddCourseModal() {
+      document.getElementById('courseId').value = '';
+      document.getElementById('title').value = '';
+      document.getElementById('description').value = '';
+      document.getElementById('file').value = '';
+      document.getElementById('fileUrl').value = '';
+      fileNameElement.textContent = 'No file chosen';
+      modalTitle.textContent = 'Add New Course';
+      document.getElementById('submitBtn').textContent = 'Add Course';
+      uploadError.classList.add('hidden');
+      showModal();
+    }
+
+    async function editCourse(courseId) {
+      try {
+        const response = await fetch(`${apiBaseUrl}/courses/${courseId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        const course = await response.json();
+        
+        if (!response.ok) throw new Error(course.error || 'Failed to load course');
+        
+        document.getElementById('courseId').value = course._id;
+        document.getElementById('title').value = course.title;
+        document.getElementById('description').value = course.description || '';
+        document.getElementById('file').value = '';
+        document.getElementById('fileUrl').value = course.fileUrl || '';
+        fileNameElement.textContent = 'No file chosen';
+        modalTitle.textContent = 'Edit Course';
+        document.getElementById('submitBtn').textContent = 'Update Course';
+        uploadError.classList.add('hidden');
+        showModal();
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    function showDeleteModal(courseId) {
+      currentCourseId = courseId;
+      deleteModal.classList.remove('invisible', 'opacity-0');
+      deleteModal.classList.add('visible', 'opacity-100');
+    }
+
+    function hideDeleteModal() {
+      deleteModal.classList.remove('visible', 'opacity-100');
+      deleteModal.classList.add('invisible', 'opacity-0');
+    }
+
+    async function confirmDelete() {
+      try {
+        const response = await fetch(`${apiBaseUrl}/courses/${currentCourseId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) throw new Error(result.error || 'Failed to delete course');
+        
+        hideDeleteModal();
+        loadCourses();
+        alert('Course deleted successfully!');
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    function showModal() {
+      courseModal.classList.remove('invisible', 'opacity-0');
+      courseModal.classList.add('visible', 'opacity-100');
+    }
+
+    function hideModal() {
+      courseModal.classList.remove('visible', 'opacity-100');
+      courseModal.classList.add('invisible', 'opacity-0');
+    }
+
+    function showLogin() {
+      loginSection.classList.remove('hidden');
+      dashboardSection.classList.add('hidden');
+    }
+
+    function showDashboard() {
+      loginSection.classList.add('hidden');
+      dashboardSection.classList.remove('hidden');
+      showCourses();
+    }
+
+    function showCourses() {
+      coursesContainer.classList.remove('hidden');
+      subscribersContainer.classList.add('hidden');
+      pageTitle.textContent = 'Course Management';
+      loadCourses();
+    }
+
+    function showSubscribers() {
+      coursesContainer.classList.add('hidden');
+      subscribersContainer.classList.remove('hidden');
+      pageTitle.textContent = 'Subscribers';
+      loadSubscribers();
+    }
+
+    function updateFileName() {
+      const fileInput = document.getElementById('file');
+      fileNameElement.textContent = fileInput.files[0] ? fileInput.files[0].name : 'No file chosen';
+    }
+
+    function logout() {
+      token = null;
+      localStorage.removeItem('token');
+      showLogin();
+    }
+
+    function showEmailMarketingModal() {
+      document.getElementById('subject').value = '';
+      document.getElementById('message').value = '';
+      emailMarketingModal.classList.remove('invisible', 'opacity-0');
+      emailMarketingModal.classList.add('visible', 'opacity-100');
+    }
+
+    function hideEmailMarketingModal() {
+      emailMarketingModal.classList.remove('visible', 'opacity-100');
+      emailMarketingModal.classList.add('invisible', 'opacity-0');
+    }
+
+    emailForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const subject = document.getElementById('subject').value;
+      const message = document.getElementById('message').value;
+      
+      try {
+        const response = await fetch(`${apiBaseUrl}/send-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ subject, message })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) throw new Error(result.error || 'Failed to send email');
+        
+        hideEmailMarketingModal();
+        alert('Email sent successfully!');
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+  </script>
+</body>
+</html>
