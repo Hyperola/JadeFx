@@ -18,7 +18,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('public/uploads'));
 
 // Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Routes for homepage and dashboard
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
 
 // Suppress Mongoose strictQuery warning
 mongoose.set('strictQuery', true);
@@ -91,16 +100,6 @@ const authMiddleware = (req, res, next) => {
 };
 
 // Routes
-
-// Serve index.html for the homepage
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Serve dashboard.html for the dashboard route
-app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
-});
 
 // Public Courses (no authentication required)
 app.get('/api/public-courses', async (req, res) => {
