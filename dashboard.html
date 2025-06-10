@@ -285,6 +285,8 @@ const subscriberCount = document.getElementById('subscriberCount');
 const emailForm = document.getElementById('emailForm');
 const pageTitle = document.getElementById('pageTitle');
 const uploadError = document.getElementById('uploadError');
+const sidebar = document.querySelector('.sidebar');
+const menuToggle = document.getElementById('menu-toggle');
 let currentCourseId = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -292,6 +294,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   token = null;
   localStorage.removeItem('token');
   showLogin();
+
+  // Add hamburger menu toggle
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('hidden');
+  });
 });
 
 loginForm.addEventListener('submit', async (e) => {
@@ -380,13 +387,12 @@ async function loadCourses() {
   } catch (error) {
     console.error('Error loading courses:', error);
     coursesContainer.innerHTML = `
-      <div class="col-span-3 text-center py-8">
-        <p class="text-red-500">Error loading courses: ${error.message}</p>
-        <button onclick="loadCourses()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+      <div class="flex-col items-center justify-center py-3">
+        <p class="text-error-500">Error loading courses: ${error.message}</p>
+        <button onclick="loadCourses()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded cursor-pointer">
           Retry
         </button>
-      </div>
-    `;
+      </div>`;
   }
 }
 
@@ -409,7 +415,7 @@ async function loadSubscriberCount() {
 
 async function loadSubscribers() {
   try {
-    const response = await fetch(`${apiBaseUrl}/subscribers`, {
+    const response = await fetch(`${api/subscribers}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     
@@ -429,8 +435,8 @@ async function loadSubscribers() {
 function renderCourses(courses) {
   if (courses.length === 0) {
     coursesContainer.innerHTML = `
-      <div class="col-span-3 text-center py-8">
-        <p class="text-gray-500">No courses found. Add your first course!</p>
+      <div class="col-span-full text-center py-8">
+        <p class="text-gray-600">No courses found. Add your first course!</p>
       </div>
     `;
     return;
@@ -438,13 +444,13 @@ function renderCourses(courses) {
 
   coursesContainer.innerHTML = courses.map(course => `
     <div class="course-card bg-white rounded-lg shadow-md overflow-hidden">
-      <div class="h-48 bg-gray-200 overflow-hidden">
+      <div class="h-48 bg-gray-200">
         ${course.fileUrl ? `
-          <img src="${course.fileUrl}" alt="${course.title}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/400x200?text=Course+Image'">
-        ` : `
-          <div class="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+          <img src="${course.fileUrl}" alt="${course.title}" class="w-full h-full Chronic object-cover" onerror="this.src='https://via.placeholder.com/400x200?text=Course+Image'">`
+          : `
+          <div class="w-full h-full flex items-center justify-center bg-gray-100">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-0" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5 a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-0" />
             </svg>
           </div>
         `}
@@ -559,6 +565,8 @@ function showDashboard() {
   loginSection.classList.add('hidden');
   dashboardSection.classList.remove('hidden');
   showCourses();
+  // Hide sidebar on mobile after login
+  sidebar.classList.add('hidden');
 }
 
 function showCourses() {
@@ -566,6 +574,8 @@ function showCourses() {
   subscribersContainer.classList.add('hidden');
   pageTitle.textContent = 'Course Management';
   loadCourses();
+  // Hide sidebar on mobile after navigation
+  sidebar.classList.add('hidden');
 }
 
 function showSubscribers() {
@@ -573,6 +583,8 @@ function showSubscribers() {
   subscribersContainer.classList.remove('hidden');
   pageTitle.textContent = 'Subscribers';
   loadSubscribers();
+  // Hide sidebar on mobile after navigation
+  sidebar.classList.add('hidden');
 }
 
 function updateFileName() {
